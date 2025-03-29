@@ -1,4 +1,4 @@
-import { WASocket, makeWASocket, DisconnectReason, ConnectionState, BaileysEventMap } from '@whiskeysockets/baileys';
+import { WASocket, makeWASocket, DisconnectReason, ConnectionState, BaileysEventMap, AuthenticationState } from '@whiskeysockets/baileys';
 import { Subject } from 'rxjs';
 import { Boom } from '@hapi/boom';
 import { AuthStateService } from './auth-state/auth-state.service';
@@ -19,6 +19,11 @@ export class WhatsAppSession {
 
   async desconectar() {
     if (this.socket) { await this.socket.logout() }
+  }
+
+  private async reconectarSessao() {
+    this.emitEvent('reconnecting');
+    await this.setupSocket();
   }
 
   private async setupSocket() {
@@ -83,11 +88,6 @@ export class WhatsAppSession {
   // Método para adicionar ou atualizar meta informação
   private setMetaInfo(key: string, value: any) {
     this.metaInfo[key] = value;
-  }
-
-  private async reconectarSessao() {
-    this.emitEvent('reconnecting');
-    await this.setupSocket();
   }
 
   private async limparSessao() {
